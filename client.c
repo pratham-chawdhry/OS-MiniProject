@@ -9,11 +9,23 @@
 #include <stdbool.h>
 #include <signal.h>
 
-# define PORT 8080
+# define PORT 8068
 # define INET_ADDR "127.0.0.1"
 
 void authorize(int sock_fd) {
+    int admin_sign = 2;
     int re_sign = 1;
+
+    printf("2");
+    while (admin_sign != 1 && admin_sign != 0) {
+        char start_prompt[100];
+        recv(sock_fd, &start_prompt, sizeof(start_prompt), 0);
+        printf("%s", start_prompt);
+        scanf("%d", &admin_sign);
+        send(sock_fd, &admin_sign, sizeof(admin_sign), 0);
+    }
+
+    printf("1");
     while (re_sign) {
         char str[100];
         recv(sock_fd, str, 100, 0);
@@ -31,7 +43,15 @@ void authorize(int sock_fd) {
         scanf("%s", password);
         send(sock_fd, password, 100, 0);
 
-        recv(sock_fd, &re_sign, sizeof(re_sign), 0);
+        if (admin_sign == 0) {
+            recv(sock_fd, &re_sign, sizeof(re_sign), 0);
+        }
+        else{
+            recv(sock_fd, &re_sign, sizeof(re_sign), 0);
+            if (re_sign == 0){
+                printf("Admin Login Successful\n");
+            }
+        }
     }
 }
 

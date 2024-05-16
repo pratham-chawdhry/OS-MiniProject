@@ -11,9 +11,12 @@
 #include <pthread.h>
 #include <signal.h>
 
-# define PORT 8080
+# define PORT 8068
 # define INET_ADDR "127.0.0.1"
 # define BACKLOG 10
+
+# define ADMIN "admin"
+# define ADMIN_PASS "admin@123"
 
 int sock_fd;
 typedef struct arg1{
@@ -32,7 +35,17 @@ void* authorize_response(void* args) {
     char* username = ((arg*)args)->username;
     char* password = ((arg*)args)->password;
 
+    int admin_sign = 2;
     int re_sign = 1;
+
+    while (admin_sign != 1 && admin_sign != 0) {
+        char start_prompt[] = "Is this an admin login? Type 1 for yes, and 0 for no... (0/1): ";
+        send(new_sock_fd, start_prompt, sizeof(start_prompt), 0);
+        recv(new_sock_fd, &admin_sign, sizeof(admin_sign), 0);
+        fflush(stdout);
+        printf("%d",admin_sign);
+    }
+
 
     while(re_sign) {
         char username_prompt[] = "Enter username: ";
@@ -48,9 +61,17 @@ void* authorize_response(void* args) {
         strcpy(username, username_response);
         strcpy(password, password_response);
 
-        void* rec = authenticate(username, password, &re_sign);
-        send(new_sock_fd, &re_sign , sizeof(re_sign), 0);
-        display(rec);
+        if (admin_sign == 0) {
+            void* rec = authenticate(username, password, &re_sign);
+            send(new_sock_fd, &re_sign , sizeof(re_sign), 0);
+            display(rec);
+        }
+        else{
+            if (admin_sign == 1 && strcmp(username, ADMIN) == 0 && strcmp(password, ADMIN_PASS) == 0) {
+                re_sign = 0;
+            }
+            send(new_sock_fd, &re_sign , sizeof(re_sign), 0);
+        }
     }
 }
 
@@ -71,6 +92,7 @@ int main() {
     if (bind(sock_fd, (struct sockaddr*)&server_address, sizeof(server_address)) == -1) {
         printf("Binding failed\n");
     };
+
     listen(sock_fd, BACKLOG);
 
     while (1) {
