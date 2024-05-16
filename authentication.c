@@ -5,9 +5,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <errno.h>
 #include <limits.h>
-#include <stdlib.h>
 #include <stdbool.h>
 
 struct Authentication authenticator_details;
