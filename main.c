@@ -10,10 +10,8 @@
 #include <stdbool.h>
 #include <pthread.h>
 #include <signal.h>
-
-# define PORT 8068
-# define INET_ADDR "127.0.0.1"
-# define BACKLOG 10
+#include "macros.h"
+#include "book.h"
 
 # define ADMIN "admin"
 # define ADMIN_PASS "admin@123"
@@ -30,6 +28,74 @@ void sigint_handler(int sig_num) {
     exit(0);
 }
 
+void admin_menu(int new_sock_fd) {
+    printf("\nAdmin menu\n");
+
+    char prompt[] = "\nChoose: \n\n1. Add user\n2. Delete user\n3. Modify user\n4. Add book\n5. Delete book\n6. Modify book\n7. Display books\n8. Display transactions\n9. Exit\n\nEnter choice: ";
+    int length_of_prompt = strlen(prompt) + 1;
+    write(new_sock_fd, &length_of_prompt, sizeof(length_of_prompt));
+    
+    char buffer[100];
+    read(new_sock_fd, buffer, sizeof(buffer));
+    write(new_sock_fd, prompt, strlen(prompt) + 1); 
+
+    while(1) {
+        int user_choice;
+        read(new_sock_fd, &user_choice, sizeof(user_choice)); 
+
+        if (user_choice == 9) {
+            break;
+        }
+
+        switch (user_choice) {
+            case 1:{}
+                break;
+            case 2:{}
+                break;
+            case 3:{}
+                break;
+            case 4:{
+                char book_title[100];
+                char author[100];
+                int quantity;
+
+                read(new_sock_fd, book_title, 100);
+                read(new_sock_fd, author, 100);
+                read(new_sock_fd, &quantity, sizeof(quantity));
+
+                int book_status = create_book_struct(book_title, author, quantity, 4);
+                write(new_sock_fd, &book_status, sizeof(book_status));
+            }
+                break;
+            case 5:{
+                char book_title[100];
+                char author[100];
+
+                read(new_sock_fd, book_title, 100);
+                read(new_sock_fd, author, 100);
+
+                int book_status = delete_book(book_title, author);
+                printf("%d\n", book_status);
+                write(new_sock_fd, &book_status, sizeof(book_status));
+            }
+                break;
+            case 6:{}
+                break;
+            case 7:{}
+                break;
+            case 8:{}
+                break;
+            case 9:
+                break;
+        }
+    }
+    return ;
+}
+
+void user_menu() {
+    printf("User menu\n");
+}
+
 void* authorize_response(void* args) {
     int new_sock_fd = ((arg*)args)->new_sock_fd;
     char* username = ((arg*)args)->username;
@@ -42,8 +108,6 @@ void* authorize_response(void* args) {
         char start_prompt[] = "Is this an admin login? Type 1 for yes, and 0 for no... (0/1): ";
         send(new_sock_fd, start_prompt, sizeof(start_prompt), 0);
         recv(new_sock_fd, &admin_sign, sizeof(admin_sign), 0);
-        fflush(stdout);
-        printf("%d",admin_sign);
     }
 
 
@@ -73,9 +137,19 @@ void* authorize_response(void* args) {
             send(new_sock_fd, &re_sign , sizeof(re_sign), 0);
         }
     }
+
+    if (re_sign == 0) {
+        if (admin_sign == 1) {
+            admin_menu(new_sock_fd);
+        }
+        else {
+            user_menu();
+        }
+    }
 }
 
 int main() {
+
     sock_fd = socket(AF_INET, SOCK_STREAM, 0);
     signal(SIGINT, sigint_handler);
 
@@ -91,9 +165,18 @@ int main() {
 
     if (bind(sock_fd, (struct sockaddr*)&server_address, sizeof(server_address)) == -1) {
         printf("Binding failed\n");
+        exit(0);
     };
 
     listen(sock_fd, BACKLOG);
+
+    printf("##       ########  ########  ##     ##  ######\n");
+    printf("##       ##     ## ##     ## ###   ### ##    ## \n");
+    printf("##       ##     ## ##     ## #### #### ##       \n");
+    printf("##       ##     ## ########  ## ### ##  ######  \n");
+    printf("##       ##     ## ##     ## ##     ##       ##  \n");
+    printf("##       ##     ## ##     ## ##     ## ##    ## \n");
+    printf("######## ########  ########  ##     ##  ######  \n");
 
     while (1) {
         socklen_t client_address_size = sizeof(client_address);
@@ -107,6 +190,10 @@ int main() {
 
         if (pthread_create(&thread_id, NULL, (void*)authorize_response, (void*)args) != 0) {
             exit(0);
+        }
+
+        if (pthread_detach(thread_id) < 0) {
+            printf("Thread cdetach failed\n");
         }
     }
     return 0;

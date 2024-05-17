@@ -9,6 +9,7 @@ struct Book {
     int deleted;
 };
 
-int bookcmp(const void *a, const void *b);
+int create_book_struct(char* title, char* author, int quantity_in_stock, int id);
+int delete_book(char* title, char* author);
 
 #endif

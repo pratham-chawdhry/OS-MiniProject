@@ -1,4 +1,5 @@
 #include "authentication.h"
+#include "macros.h"
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
