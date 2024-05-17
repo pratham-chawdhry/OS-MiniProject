@@ -23,13 +23,24 @@ void admin_menu(int sock_fd){
     write(sock_fd, buffer, sizeof(buffer));
     read(sock_fd, line, sizeof(line));
 
+    getchar();
     while(1) {
-        int option = 0;
-        while(option < 1 || option > 9) {
+        char char_option = '0';
+        while(char_option < '1'|| char_option > '9') {
             printf("%s", line);
-            scanf("%d", &option);
+            while(1){
+            scanf("%c", &char_option);
+                if (char_option == '\n' || char_option == ' ') {
+                    continue;
+                }
+                else{
+                    break;
+                }
+            }
+            getchar();
         }
 
+        int option = char_option - '0';
         write(sock_fd, &option, sizeof(option));
 
         if (option == 9) {
@@ -46,7 +57,7 @@ void admin_menu(int sock_fd){
             case 4:{
                 char book_title[100];
                 char author[100];
-                int quantity;
+                int quantity = -1;
 
                 printf("\nEnter book title: ");
                 fflush(stdout);
@@ -62,9 +73,10 @@ void admin_menu(int sock_fd){
                 author[length] = '\0';
                 write(sock_fd, author, 100);
 
-                printf("Enter quantity: ");
-                fflush(stdout);
-                scanf("%d", &quantity);
+                while (quantity < 0) {
+                    printf("Enter quantity: ");
+                    scanf("%d", &quantity);
+                }
                 write(sock_fd, &quantity, sizeof(quantity));
 
                 int book_status;
@@ -113,9 +125,105 @@ void admin_menu(int sock_fd){
                 }
             }
                 break;
-            case 6:{}
+            case 6:{
+                int id, case_id = 0;
+                char buffer[100];
+
+                printf("Choose a valid Book ID: ");
+                scanf("%d", &id);
+                
+                while (case_id < 1 || case_id > 3) {
+                    printf("\nChoose: \n\n1. Modify book title\n2. Modify author\n3. Modify quantity\n\nEnter choice: ");
+                    scanf("%d", &case_id);
+                }
+
+                write(sock_fd, &id, sizeof(id));
+                read(sock_fd, buffer, sizeof(buffer));
+                write(sock_fd, &case_id, sizeof(case_id));
+                read(sock_fd, buffer, sizeof(buffer));
+
+                switch (case_id) {
+                    case 1:{
+                        char book_title[100];
+
+                        printf("\nEnter book title: ");
+                        fflush(stdout);
+                        read(0, book_title, 100);
+                        int length = strcspn(book_title, "\n");
+                        book_title[length] = '\0';
+                        write(sock_fd, book_title, 100);
+                    }
+                        break;
+                    case 2:{
+                        char author[100];
+
+                        printf("\nEnter author: ");
+                        fflush(stdout);
+                        read(0, author, 100);
+                        int length = strcspn(author, "\n");
+                        author[length] = '\0';
+                        write(sock_fd, author, 100);
+                    }
+                        break;
+                    case 3:{
+                        int quantity = -1;
+
+                        while (quantity < 0) {
+                            printf("\nEnter quantity: ");
+                            scanf("%d", &quantity);
+                        }
+                        write(sock_fd, &quantity, sizeof(quantity));
+                    }
+                        break;
+                }
+
+                int book_status;
+                read(sock_fd, &book_status, sizeof(book_status));
+
+                if (book_status == ERROR) {
+                    printf("\nError while modifying book...\n");
+                }
+                else if (book_status == BOOK_DOES_NOT_EXIST){
+                    printf("\nBook does not exist...\n");
+                }
+                else if (book_status == BOOK_CANT_BE_MODIFIED) {
+                    printf("\nBook cannot be modified...\n");
+                }
+                else if (book_status == BOOK_MODIFIED) {
+                    printf("\nBook modified successfully...\n");
+                }
+            }
                 break;
-            case 7:{}
+            case 7:{
+                char buffer[] = "Ready for input\n";
+
+                int num_of_books;
+                read(sock_fd, &num_of_books, sizeof(num_of_books));
+                write(sock_fd, buffer, sizeof(buffer));
+
+                printf("\nNumber of books: %d\n", num_of_books);
+
+                for (int i = 0; i < num_of_books; i++){
+                    int id;
+                    read(sock_fd, &id, sizeof(id));
+                    write(sock_fd, buffer, sizeof(buffer));
+
+                    char title[100];
+                    read(sock_fd, title, 100);
+                    write(sock_fd, buffer, sizeof(buffer));
+
+                    char author[100];
+                    read(sock_fd, author, 100);
+                    write(sock_fd, buffer, sizeof(buffer));
+
+                    int quantity;
+                    read(sock_fd, &quantity, sizeof(quantity));
+
+                    printf("\nBook: %d\nTitle: %s\nAuthor: %s\nQuantity in stock: %d\n", id, title, author, quantity);
+
+                    write(sock_fd, buffer, sizeof(buffer));
+                }
+            }
                 break;
             case 8:{}
                 break;

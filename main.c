@@ -75,13 +75,74 @@ void admin_menu(int new_sock_fd) {
                 read(new_sock_fd, author, 100);
 
                 int book_status = delete_book(book_title, author);
-                printf("%d\n", book_status);
                 write(new_sock_fd, &book_status, sizeof(book_status));
             }
                 break;
-            case 6:{}
+            case 6:{
+                int case_id, id, quantity;
+                char buffer[] = "Ready for input\n";
+                char title[100], author[100];
+
+                read(new_sock_fd, &id, sizeof(id));
+                write(new_sock_fd, buffer, sizeof(buffer));
+                read(new_sock_fd, &case_id, sizeof(case_id));
+                write(new_sock_fd, buffer, sizeof(buffer));
+
+                switch(case_id) { 
+                    case 1:{
+                        read(new_sock_fd, title, 100);
+                    }
+                        break;
+                    case 2:{
+                        read(new_sock_fd, author, 100);
+                    }
+                        break;
+                    case 3:{
+                        read(new_sock_fd, &quantity, sizeof(quantity));
+                    }
+                        break;
+                }
+
+                int book_status = update_book(id, title, author, quantity, case_id);
+                write(new_sock_fd, &book_status, sizeof(book_status));
+            }
                 break;
-            case 7:{}
+            case 7:{
+                int num_of_books = get_num_of_books();
+
+                if (num_of_books != ERROR){
+                    printf("Number of books: %d\n", num_of_books);
+                }
+                else{
+                    continue;
+                }
+
+                struct Book** books = (struct Book**)malloc(num_of_books * sizeof(struct Book*));
+                int book_status = get_books(books);
+
+                char buffer[100];
+                write(new_sock_fd, &num_of_books, sizeof(num_of_books));
+                read(new_sock_fd, buffer, sizeof(buffer));
+
+                for (int i = 0; i < num_of_books; i++){
+                    int id = books[i]->id;
+                    char* title = books[i]->title;
+                    char* author = books[i]->author;
+                    int quantity = books[i]->quantity_in_stock;
+
+                    write(new_sock_fd, &id, sizeof(id));
+                    read(new_sock_fd, buffer, sizeof(buffer));
+
+                    write(new_sock_fd, title, strlen(title) + 1);
+                    read(new_sock_fd, buffer, sizeof(buffer));
+
+                    write(new_sock_fd, author, strlen(author) + 1);
+                    read(new_sock_fd, buffer, sizeof(buffer));
+
+                    write(new_sock_fd, &quantity, sizeof(quantity));
+                    read(new_sock_fd, buffer, sizeof(buffer));
+                }
+            }
                 break;
             case 8:{}
                 break;
@@ -193,7 +254,7 @@ int main() {
         }
 
         if (pthread_detach(thread_id) < 0) {
-            printf("Thread cdetach failed\n");
+            printf("Thread detach failed\n");
         }
     }
     return 0;
