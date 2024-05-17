@@ -7,7 +7,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <stdbool.h>
-#include <signal.h>
 #include "macros.h"
 #include <string.h>
 #include <fcntl.h>
@@ -108,7 +107,6 @@ int delete_book(char* title, char* author) {
         if (fp == -1) {
             return ERROR;
         }
-        display_books(book);
 
         lseek(fp, (book.id - 1) * sizeof(struct Book), SEEK_SET);
         if (write(fp, &book, sizeof(struct Book)) == -1) {
@@ -199,7 +197,6 @@ int update_book(int id, char* new_title, char* new_author, int new_quantity_in_s
             return BOOK_CANT_BE_MODIFIED;
         }
 
-        display_books(book);
         int fp = open("books.dat", O_WRONLY | O_CREAT, 0666);
         if (fp == -1) {
             return ERROR;

@@ -128,14 +128,27 @@ void admin_menu(int sock_fd){
             case 6:{
                 int id, case_id = 0;
                 char buffer[100];
+                char char_case_id = '0';
+                char new_line[] = "\nChoose: \n\n1. Modify book title\n2. Modify author\n3. Modify quantity\n\nEnter choice: ";
 
                 printf("Choose a valid Book ID: ");
                 scanf("%d", &id);
-                
-                while (case_id < 1 || case_id > 3) {
-                    printf("\nChoose: \n\n1. Modify book title\n2. Modify author\n3. Modify quantity\n\nEnter choice: ");
-                    scanf("%d", &case_id);
+
+                while(char_case_id < '1'|| char_case_id > '3') {
+                    printf("%s", new_line);
+                    while(1){
+                    scanf("%c", &char_case_id);
+                        if (char_case_id == '\n' || char_case_id == ' ') {
+                            continue;
+                        }
+                        else{
+                            break;
+                        }
+                    }
+                    getchar();
                 }
+
+                case_id = char_case_id - '0';
 
                 write(sock_fd, &id, sizeof(id));
                 read(sock_fd, buffer, sizeof(buffer));

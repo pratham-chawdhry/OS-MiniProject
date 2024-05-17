@@ -110,10 +110,7 @@ void admin_menu(int new_sock_fd) {
             case 7:{
                 int num_of_books = get_num_of_books();
 
-                if (num_of_books != ERROR){
-                    printf("Number of books: %d\n", num_of_books);
-                }
-                else{
+                if (num_of_books == ERROR){
                     continue;
                 }
 
@@ -189,7 +186,6 @@ void* authorize_response(void* args) {
         if (admin_sign == 0) {
             void* rec = authenticate(username, password, &re_sign);
             send(new_sock_fd, &re_sign , sizeof(re_sign), 0);
-            display(rec);
         }
         else{
             if (admin_sign == 1 && strcmp(username, ADMIN) == 0 && strcmp(password, ADMIN_PASS) == 0) {
@@ -231,11 +227,11 @@ int main() {
 
     listen(sock_fd, BACKLOG);
 
-    printf("##       ########  ########  ##     ##  ######\n");
+    printf("##       ########  ########  ##     ##  ######  \n");
     printf("##       ##     ## ##     ## ###   ### ##    ## \n");
     printf("##       ##     ## ##     ## #### #### ##       \n");
     printf("##       ##     ## ########  ## ### ##  ######  \n");
-    printf("##       ##     ## ##     ## ##     ##       ##  \n");
+    printf("##       ##     ## ##     ## ##     ##       ## \n");
     printf("##       ##     ## ##     ## ##     ## ##    ## \n");
     printf("######## ########  ########  ##     ##  ######  \n");
 
