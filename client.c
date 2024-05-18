@@ -78,37 +78,37 @@ void admin_menu(int sock_fd){
                 }
             }
                 break;
+            // case 2:{
+            //     char username[100];
+            //     char password[100];
+
+            //     char buffer[100];
+
+            //     printf("\nEnter username: ");
+            //     scanf("%s", username);
+
+            //     printf("Enter password: ");
+            //     scanf("%s", password);
+
+            //     write(sock_fd, username, strlen(username) + 1);
+            //     read(sock_fd, buffer, sizeof(buffer));
+            //     write(sock_fd, password, strlen(password) + 1);
+
+            //     int user_status;
+            //     read(sock_fd, &user_status, sizeof(user_status));
+
+            //     if (user_status == USER_DELETED) {
+            //         printf("\nUser deleted successfully...\n");
+            //     }
+            //     else if (user_status == USER_DOES_NOT_EXIST) {
+            //         printf("\nUser does not exist, so cannot be deleted...\n");
+            //     }
+            //     else if (user_status == ERROR) {
+            //         printf("\nError while deleting user...\n");
+            //     }
+            // }
+            //     break;
             case 2:{
-                char username[100];
-                char password[100];
-
-                char buffer[100];
-
-                printf("\nEnter username: ");
-                scanf("%s", username);
-
-                printf("Enter password: ");
-                scanf("%s", password);
-
-                write(sock_fd, username, strlen(username) + 1);
-                read(sock_fd, buffer, sizeof(buffer));
-                write(sock_fd, password, strlen(password) + 1);
-
-                int user_status;
-                read(sock_fd, &user_status, sizeof(user_status));
-
-                if (user_status == USER_DELETED) {
-                    printf("\nUser deleted successfully...\n");
-                }
-                else if (user_status == USER_DOES_NOT_EXIST) {
-                    printf("\nUser does not exist, so cannot be deleted...\n");
-                }
-                else if (user_status == ERROR) {
-                    printf("\nError while deleting user...\n");
-                }
-            }
-                break;
-            case 3:{
                 char username[100];
                 char password[100];
                 char new_password[100];
@@ -145,7 +145,7 @@ void admin_menu(int sock_fd){
                 }
             }
                 break;
-            case 4:{
+            case 3:{
                 char book_title[100];
                 char author[100];
                 int quantity = -1;
@@ -184,7 +184,7 @@ void admin_menu(int sock_fd){
                 }
             }
                 break;
-            case 5:{
+            case 4:{
                 char book_title[100];
                 char author[100];
 
@@ -216,7 +216,7 @@ void admin_menu(int sock_fd){
                 }
             }
                 break;
-            case 6:{
+            case 5:{
                 int id, case_id = 0;
                 char buffer[100];
                 char char_case_id = '0';
@@ -298,7 +298,7 @@ void admin_menu(int sock_fd){
                 }
             }
                 break;
-            case 7:{
+            case 6:{
                 char buffer[] = "Ready for input\n";
 
                 int num_of_books;
@@ -329,9 +329,9 @@ void admin_menu(int sock_fd){
                 }
             }
                 break;
-            case 8:{}
-                break;
-            case 9:{}
+            // case 8:{}
+            //     break;
+            case 7:{}
                 break;
         }
     }

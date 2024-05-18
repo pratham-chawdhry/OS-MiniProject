@@ -31,7 +31,8 @@ void sigint_handler(int sig_num) {
 void admin_menu(int new_sock_fd) {
     printf("\nAdmin menu\n");
 
-    char prompt[] = "\nChoose: \n\n1. Add user\n2. Delete user\n3. Modify user\n4. Add book\n5. Delete book\n6. Modify book\n7. Display books\n8. Display transactions\n9. Exit\n\nEnter choice: ";
+    //char prompt[] = "\nChoose: \n\n1. Add user\n2. Delete user\n3. Modify user\n4. Add book\n5. Delete book\n6. Modify book\n7. Display books\n8. Display transactions\n9. Exit\n\nEnter choice: ";
+    char prompt[] = "\nChoose: \n\n1. Add user\n2. Modify user\n3. Add book\n4. Delete book\n5. Modify book\n6. Display books\n7. Exit\n\nEnter choice: ";
     int length_of_prompt = strlen(prompt) + 1;
     write(new_sock_fd, &length_of_prompt, sizeof(length_of_prompt));
     
@@ -62,20 +63,20 @@ void admin_menu(int new_sock_fd) {
                 write(new_sock_fd, &user_status, sizeof(user_status));
             }
                 break;
+            // case 2:{
+            //     char username[100];
+            //     char password[100];
+            //     char buffer[] = "Ready for input\n";
+
+            //     read(new_sock_fd, username, 100);
+            //     write(new_sock_fd, buffer, sizeof(buffer));
+            //     read(new_sock_fd, password, 100);
+
+            //     int user_status = delete_user(username, password);
+            //     write(new_sock_fd, &user_status, sizeof(user_status));
+            // }
+            //     break;
             case 2:{
-                char username[100];
-                char password[100];
-                char buffer[] = "Ready for input\n";
-
-                read(new_sock_fd, username, 100);
-                write(new_sock_fd, buffer, sizeof(buffer));
-                read(new_sock_fd, password, 100);
-
-                int user_status = delete_user(username, password);
-                write(new_sock_fd, &user_status, sizeof(user_status));
-            }
-                break;
-            case 3:{
                 char username[100];
                 char password[100];
                 char new_password[100];
@@ -92,7 +93,7 @@ void admin_menu(int new_sock_fd) {
                 write(new_sock_fd, &user_status, sizeof(user_status));
             }
                 break;
-            case 4:{
+            case 3:{
                 char book_title[100];
                 char author[100];
                 int quantity;
@@ -105,7 +106,7 @@ void admin_menu(int new_sock_fd) {
                 write(new_sock_fd, &book_status, sizeof(book_status));
             }
                 break;
-            case 5:{
+            case 4:{
                 char book_title[100];
                 char author[100];
 
@@ -116,7 +117,7 @@ void admin_menu(int new_sock_fd) {
                 write(new_sock_fd, &book_status, sizeof(book_status));
             }
                 break;
-            case 6:{
+            case 5:{
                 int case_id, id, quantity;
                 char buffer[] = "Ready for input\n";
                 char title[100], author[100];
@@ -145,7 +146,7 @@ void admin_menu(int new_sock_fd) {
                 write(new_sock_fd, &book_status, sizeof(book_status));
             }
                 break;
-            case 7:{
+            case 6:{
                 int num_of_books = get_num_of_books();
 
                 if (num_of_books == ERROR){
@@ -179,9 +180,7 @@ void admin_menu(int new_sock_fd) {
                 }
             }
                 break;
-            case 8:{}
-                break;
-            case 9:
+            case 7:
                 break;
         }
     }
