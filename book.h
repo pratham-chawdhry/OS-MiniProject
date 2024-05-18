@@ -11,6 +11,7 @@ struct Book {
 
 extern int num_of_unique_books;
 
+int search_book(struct Book* book, int comparison_id);
 int display_books(struct Book book);
 int create_book_struct(char* title, char* author, int quantity_in_stock, int id);
 int delete_book(char* title, char* author);

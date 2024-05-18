@@ -1,7 +1,7 @@
 #ifndef MACROS_H
 #define MACROS_H
 
-#define PORT 6602
+#define PORT 6603
 
 #define INET_ADDR "127.0.0.1"
 #define BACKLOG 10
@@ -22,6 +22,11 @@
 #define USER_DOES_NOT_EXIST 11
 #define USER_DELETED 12
 #define USER_MODIFIED 13
+
+#define BOOK_ALREADY_ISSUED 14
+#define BORROWING_LIMIT_REACHED 15
+#define BOOK_OUT_OF_STOCK 16
+#define BOOK_ISSUED 17
 
 #define BORROWING_LIMITS 5
 

@@ -10,6 +10,87 @@
 #include "macros.h"
 #include <string.h>
 
+void user_menu(int sock_fd){
+    printf("User menu\n");
+    char prompt[100];
+
+    int length_of_prompt;
+    read(sock_fd, &length_of_prompt, sizeof(length_of_prompt));
+
+    char line[length_of_prompt];
+
+    char buffer[] = "Ready for input\n";
+    write(sock_fd, buffer, sizeof(buffer));
+    read(sock_fd, line, sizeof(line));
+
+    getchar();
+
+    while(1) {
+        char char_option = '0';
+        while(char_option < '1'|| char_option > '9') {
+            printf("%s", line);
+            while(1){
+            scanf("%c", &char_option);
+                if (char_option == '\n' || char_option == ' ') {
+                    continue;
+                }
+                else{
+                    break;
+                }
+            }
+            getchar();
+        }
+
+        int option = char_option - '0';
+        write(sock_fd, &option, sizeof(option));
+
+        if (option == 4) {
+            break;
+        }
+
+        switch (option) {
+            case 1:{
+
+            } break;
+            case 2:{
+                int id;
+
+                printf("Enter Book ID: ");
+                scanf("%d", &id);
+                write(sock_fd, &id, sizeof(id));
+
+                int book_status;
+                read(sock_fd, &book_status, sizeof(book_status));
+
+                if (book_status == BOOK_ALREADY_ISSUED) {
+                    printf("\nBook already issued...\n");
+                }
+                else if (book_status == USER_DOES_NOT_EXIST) {
+                    printf("\nUser does not exist...\n");
+                    exit(0);
+                }
+                else if (book_status == BOOK_DOES_NOT_EXIST) {
+                    printf("\nBook does not exist...\n");
+                }
+                else if (book_status == BORROWING_LIMIT_REACHED) {
+                    printf("\nBorrowing limit reached...\n");
+                }
+                else if (book_status == ERROR) {
+                    printf("\nError while checking book...\n");
+                }
+                else if (book_status == BOOK_OUT_OF_STOCK){
+                    printf("\nBook out of stock...\n");
+                }
+                else if (book_status == BOOK_ISSUED) {
+                    printf("\nBook issued successfully...\n");
+                }
+            } break;
+            case 3:{
+            } break;
+        }
+    }
+}
+
 void admin_menu(int sock_fd){
     printf("Admin menu\n");
     char prompt[100];
@@ -43,7 +124,7 @@ void admin_menu(int sock_fd){
         int option = char_option - '0';
         write(sock_fd, &option, sizeof(option));
 
-        if (option == 9) {
+        if (option == 7) {
             break;
         }
 
@@ -369,7 +450,12 @@ void authorize(int sock_fd) {
         if (admin_sign == 0) {
             recv(sock_fd, &re_sign, sizeof(re_sign), 0);
 
-            printf("\nWrong username or password...\n");
+            if (re_sign == 0) {
+                printf("\nUser Login Successful\n");
+            }
+            else {
+                printf("\nUser Login Failed. Wrong Credentials, please try again...\n");
+            }
         }
         else{
             recv(sock_fd, &re_sign, sizeof(re_sign), 0);
@@ -385,6 +471,9 @@ void authorize(int sock_fd) {
     if (re_sign == 0) {
         if (admin_sign == 1) {
             admin_menu(sock_fd);
+        }
+        else {
+            user_menu(sock_fd);
         }
     }
 }

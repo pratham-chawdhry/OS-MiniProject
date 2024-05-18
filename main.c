@@ -1,4 +1,5 @@
 #include "authentication.h"
+#include "transactions.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -12,6 +13,7 @@
 #include <signal.h>
 #include "macros.h"
 #include "book.h"
+#include "transactions.h"
 
 # define ADMIN "admin"
 # define ADMIN_PASS "admin@123"
@@ -26,6 +28,47 @@ typedef struct arg1{
 void sigint_handler(int sig_num) {
     close(sock_fd);
     exit(0);
+}
+
+void user_menu(int new_sock_fd, char* username, char* password) {
+    printf("User menu\n");
+
+    char prompt[] = "\nChoose: \n\n1. Display books\n2. Issue book\n3. Return book\n4. Logout\n\nEnter choice: ";
+    int length_of_prompt = strlen(prompt) + 1;
+    write(new_sock_fd, &length_of_prompt, sizeof(length_of_prompt));
+
+    char buffer[100];
+    read(new_sock_fd, buffer, sizeof(buffer));
+    write(new_sock_fd, prompt, strlen(prompt) + 1);
+
+    while(1) {
+        int user_choice;
+        read(new_sock_fd, &user_choice, sizeof(user_choice));
+
+        if (user_choice == 4) {
+            break;
+        }
+
+        switch (user_choice) {
+            case 1:{
+                break;
+            }
+            case 2:{
+                int book_id;
+                read(new_sock_fd, &book_id, sizeof(book_id));
+
+                int book_status = issue_book(book_id, username, password);
+                write(new_sock_fd, &book_status, sizeof(book_status));
+                break;
+            }
+            case 3:{
+                break;
+            }
+            default:
+                printf("Invalid choice\n");
+                break;
+        }
+    }
 }
 
 void admin_menu(int new_sock_fd) {
@@ -44,7 +87,7 @@ void admin_menu(int new_sock_fd) {
         int user_choice;
         read(new_sock_fd, &user_choice, sizeof(user_choice)); 
 
-        if (user_choice == 9) {
+        if (user_choice == 7) {
             break;
         }
 
@@ -187,10 +230,6 @@ void admin_menu(int new_sock_fd) {
     return ;
 }
 
-void user_menu() {
-    printf("User menu\n");
-}
-
 void* authorize_response(void* args) {
     int new_sock_fd = ((arg*)args)->new_sock_fd;
     char* username = ((arg*)args)->username;
@@ -237,7 +276,7 @@ void* authorize_response(void* args) {
             admin_menu(new_sock_fd);
         }
         else {
-            user_menu();
+            user_menu(new_sock_fd, username, password);
         }
     }
 }

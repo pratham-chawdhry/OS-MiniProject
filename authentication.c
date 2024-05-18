@@ -111,8 +111,6 @@ int create_user(char* username, char* password) {
 
     int position = lseek(fd, 0, SEEK_END);
 
-    printf("position: %d\n", position);
-    printf("sizeof: %d\n", sizeof(struct Authentication));
     if (position == -1) {
         return ERROR;
     }
@@ -175,8 +173,6 @@ int modify_user(char* username, char* password, char* new_password) {
     if (fd == -1) {
         return ERROR;
     }
-
-    // int position = lseek(fd, (auth.key - 1 )* sizeof(struct Authentication), SEEK_SET);
 
     int position = lseek(fd, (auth.key - 1 )* sizeof(struct Authentication), SEEK_SET);
     if (position == -1) {

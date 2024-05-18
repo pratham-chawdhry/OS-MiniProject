@@ -9,6 +9,7 @@ struct Authentication {
     int is_deleted;
 };
 
+int search_user(struct Authentication* auth, int id);
 int create_user(char* username, char* password);
 int delete_user(char* username, char* password);
 int modify_user(char* username, char* password, char* new_password);
