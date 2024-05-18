@@ -48,11 +48,102 @@ void admin_menu(int sock_fd){
         }
 
         switch (option) {
-            case 1:{}
+            case 1:{
+                char username[100];
+                char password[100];
+
+                char buffer[100];
+
+                printf("\nEnter username: ");
+                scanf("%s", username);
+
+                printf("Enter password: ");
+                scanf("%s", password);
+
+                write(sock_fd, username, strlen(username) + 1);
+                read(sock_fd, buffer, sizeof(buffer));
+                write(sock_fd, password, strlen(password) + 1);
+
+                int user_status;
+                read(sock_fd, &user_status, sizeof(user_status));
+
+                if (user_status == USER_CREATED) {
+                    printf("\nUser created successfully...\n");
+                }
+                else if (user_status == USER_CANT_BE_CREATED) {
+                    printf("\nUser cannot be created...\n");
+                }
+                else if (user_status == ERROR) {
+                    printf("\nError while creating user...\n");
+                }
+            }
                 break;
-            case 2:{}
+            case 2:{
+                char username[100];
+                char password[100];
+
+                char buffer[100];
+
+                printf("\nEnter username: ");
+                scanf("%s", username);
+
+                printf("Enter password: ");
+                scanf("%s", password);
+
+                write(sock_fd, username, strlen(username) + 1);
+                read(sock_fd, buffer, sizeof(buffer));
+                write(sock_fd, password, strlen(password) + 1);
+
+                int user_status;
+                read(sock_fd, &user_status, sizeof(user_status));
+
+                if (user_status == USER_DELETED) {
+                    printf("\nUser deleted successfully...\n");
+                }
+                else if (user_status == USER_DOES_NOT_EXIST) {
+                    printf("\nUser does not exist, so cannot be deleted...\n");
+                }
+                else if (user_status == ERROR) {
+                    printf("\nError while deleting user...\n");
+                }
+            }
                 break;
-            case 3:{}
+            case 3:{
+                char username[100];
+                char password[100];
+                char new_password[100];
+                char buffer[100];
+
+                printf("\nEnter details of user to be modified: \n");
+                printf("\nEnter username: ");
+                scanf("%s", username);
+
+                printf("Enter password: ");
+                scanf("%s", password);
+
+                printf("\nEnter new password: ");
+                scanf("%s", new_password);
+
+                write(sock_fd, username, strlen(username) + 1);
+                read(sock_fd, buffer, sizeof(buffer));
+                write(sock_fd, password, strlen(password) + 1);
+                
+                read(sock_fd, buffer, sizeof(buffer));
+                write(sock_fd, new_password, strlen(new_password) + 1);
+
+                int user_status;
+                read(sock_fd, &user_status, sizeof(user_status));
+
+                if (user_status == USER_MODIFIED) {
+                    printf("\nUser modified successfully...\n");
+                }
+                else if (user_status == USER_DOES_NOT_EXIST) {
+                    printf("\nUser does not exist, so cannot be modified...\n");
+                }
+                else if (user_status == ERROR) {
+                    printf("\nError while modifying user...\n");
+                }
+            }
                 break;
             case 4:{
                 char book_title[100];
@@ -277,6 +368,8 @@ void authorize(int sock_fd) {
 
         if (admin_sign == 0) {
             recv(sock_fd, &re_sign, sizeof(re_sign), 0);
+
+            printf("\nWrong username or password...\n");
         }
         else{
             recv(sock_fd, &re_sign, sizeof(re_sign), 0);

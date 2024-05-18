@@ -48,11 +48,49 @@ void admin_menu(int new_sock_fd) {
         }
 
         switch (user_choice) {
-            case 1:{}
+            case 1:{
+                char username[100];
+                char password[100];
+                char buffer[] = "Ready for input\n";
+                
+                read(new_sock_fd, username, 100);
+                write(new_sock_fd, buffer, sizeof(buffer));
+                read(new_sock_fd, password, 100);
+
+                int user_status = create_user(username, password);
+                printf("%d\n", user_status);
+                write(new_sock_fd, &user_status, sizeof(user_status));
+            }
                 break;
-            case 2:{}
+            case 2:{
+                char username[100];
+                char password[100];
+                char buffer[] = "Ready for input\n";
+
+                read(new_sock_fd, username, 100);
+                write(new_sock_fd, buffer, sizeof(buffer));
+                read(new_sock_fd, password, 100);
+
+                int user_status = delete_user(username, password);
+                write(new_sock_fd, &user_status, sizeof(user_status));
+            }
                 break;
-            case 3:{}
+            case 3:{
+                char username[100];
+                char password[100];
+                char new_password[100];
+                char buffer[] = "Ready for input\n";
+
+                read(new_sock_fd, username, 100);
+                write(new_sock_fd, buffer, sizeof(buffer));
+                read(new_sock_fd, password, 100);
+
+                write(new_sock_fd, buffer, sizeof(buffer));
+                read(new_sock_fd, new_password, 100);
+
+                int user_status = modify_user(username, password, new_password);
+                write(new_sock_fd, &user_status, sizeof(user_status));
+            }
                 break;
             case 4:{
                 char book_title[100];
