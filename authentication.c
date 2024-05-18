@@ -72,12 +72,15 @@ int search_user(struct Authentication* auth, int id) {
         }
         else if (id == 2){ //Deletion we need to verify if user agrees, so username password is important
             if (strcmp(auth->username, comparison.username) == 0 && strcmp(auth->password, comparison.password) == 0) {
+                auth->key = comparison.key;
+                auth->is_deleted = 1;
                 close(fd);
                 return USER_EXISTS;
             }
         }
         else if (id == 3){ //we need to check if a user exists, so username is important and verify password before changing password
             if (strcmp(auth->username, comparison.username) == 0 && strcmp(auth->password, comparison.password) == 0) {
+                auth->key = comparison.key;
                 for (int i = 0; i < 20; i++) auth->borrow_items[i] = comparison.borrow_items[i]; //copy borrow items
                 close(fd);
                 return USER_EXISTS;
@@ -106,6 +109,16 @@ int create_user(char* username, char* password) {
         return ERROR;
     }
 
+    int position = lseek(fd, 0, SEEK_END);
+
+    printf("position: %d\n", position);
+    printf("sizeof: %d\n", sizeof(struct Authentication));
+    if (position == -1) {
+        return ERROR;
+    }
+
+    auth.key = position / sizeof(struct Authentication) + 1;
+
     if (write(fd, &auth, sizeof(struct Authentication)) == -1) {
         return ERROR;
     }
@@ -131,6 +144,13 @@ int delete_user(char* username, char* password) {
         return ERROR;
     }
 
+    int position = lseek(fd, (auth.key - 1 )* sizeof(struct Authentication), SEEK_SET);
+    if (position == -1) {
+        return ERROR;
+    }
+
+    auth.key = position / sizeof(struct Authentication) + 1;
+
     if (write(fd, &auth, sizeof(struct Authentication)) == -1) {
         return ERROR;
     }
@@ -155,6 +175,15 @@ int modify_user(char* username, char* password, char* new_password) {
     if (fd == -1) {
         return ERROR;
     }
+
+    // int position = lseek(fd, (auth.key - 1 )* sizeof(struct Authentication), SEEK_SET);
+
+    int position = lseek(fd, (auth.key - 1 )* sizeof(struct Authentication), SEEK_SET);
+    if (position == -1) {
+        return ERROR;
+    }
+
+    strcpy(auth.password, new_password);
 
     if (write(fd, &auth, sizeof(struct Authentication)) == -1) {
         return ERROR;
