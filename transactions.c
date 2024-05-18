@@ -38,12 +38,20 @@ int issue_book(int book_id, char* username, char* password) {
     int empty_index = -1;
 
     for (int i = 0; i < BORROWING_LIMITS; i++) { //Check if borrowing limit is reached
+        struct Book borrowed_book;
+        borrowed_book.id = auth.borrow_items[i];
+
+        if (search_book(&borrowed_book, 2) == BOOK_DOES_NOT_EXIST) {
+            auth.borrow_items[i] = 0;
+        }
         if (auth.borrow_items[i] == 0 && empty_index == -1) {
             empty_index = i;
         }
         if (auth.borrow_items[i] == book_id) {
             return BOOK_ALREADY_ISSUED;
         }
+
+        printf("%d\n", auth.borrow_items[i]);
     }
 
     if (empty_index == -1) {
@@ -56,33 +64,41 @@ int issue_book(int book_id, char* username, char* password) {
 
     auth.borrow_items[empty_index] = book_id; //Issue book
 
+    //Issue book, delete book, try to either search or return borrowed book
+    
     int fd = open("authenticator.dat", O_WRONLY | O_CREAT, 0666);
     if (fd == -1) {
+        printf("Error while modifying book 1...\n");
         return ERROR;
     }
 
     int position = lseek(fd, (auth.key - 1 )* sizeof(struct Authentication), SEEK_SET);
     if (position == -1) {
+        printf("Error while modifying book 2...\n");
         return ERROR;
     }
 
     if (write(fd, &auth, sizeof(struct Authentication)) == -1) {
+        printf("Error while modifying book 3...\n");
         return ERROR;
     }
     close(fd);
 
     int fp = open("books.dat", O_WRONLY | O_CREAT, 0666);
     if (fp == -1) {
+        printf("Error while modifying book 4...\n");
         return ERROR;
     }
 
     position = lseek(fp, (book.id - 1) * sizeof(struct Book), SEEK_SET);
     if (position == -1) {
+        printf("Error while modifying book 5...\n");
         return ERROR;
     }
 
     book.quantity_in_stock--;
     if (write(fp, &book, sizeof(struct Book)) == -1) {
+        printf("Error while modifying book 6...\n"); 
         return ERROR;
     }
     close(fp);

@@ -1,7 +1,7 @@
 #ifndef MACROS_H
 #define MACROS_H
 
-#define PORT 6603
+#define PORT 6605
 
 #define INET_ADDR "127.0.0.1"
 #define BACKLOG 10
