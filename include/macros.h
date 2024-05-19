@@ -1,6 +1,11 @@
 #ifndef MACROS_H
 #define MACROS_H
 
+#include <pthread.h>
+
+extern pthread_mutex_t mutex_users;
+extern pthread_cond_t mutex_books;
+
 #define PORT 6606
 
 #define INET_ADDR "127.0.0.1"
@@ -31,5 +36,8 @@
 #define BOOK_RETURNED 19
 
 #define BORROWING_LIMITS 5
+
+#define SUCCESS 20
+#define FAILURE 21
 
 #endif

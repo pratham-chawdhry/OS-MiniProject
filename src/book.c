@@ -1,5 +1,6 @@
 #include "../include/book.h"
 #include "../include/macros.h"
+#include "../include/utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -27,13 +28,18 @@ int add_book(struct Book book) {
     }
 
     int position = lseek(fp, 0, SEEK_END);
+    struct flock lock = lock_file(fp);
+
     if (position != -1) {
         book.id = position / sizeof(struct Book) + 1;
         if (write(fp, &book, sizeof(struct Book)) != -1) {
+            unlock_file(fp, lock);
             close(fp);
             return BOOK_ADDED;
         }
     }
+
+    unlock_file(fp, lock);
     close(fp);
     return ERROR;
 }
@@ -109,11 +115,17 @@ int delete_book(char* title, char* author) {
             return ERROR;
         }
 
-        lseek(fp, (book.id - 1) * sizeof(struct Book), SEEK_SET);
+
+        int position = lseek(fp, (book.id - 1) * sizeof(struct Book), SEEK_SET);
+        struct flock lock = lock_a_record(fp, position, sizeof(struct Book));
+
         if (write(fp, &book, sizeof(struct Book)) == -1) {
+            unlock_a_record(fp, lock);
             close(fp);
             return ERROR;
         }
+
+        unlock_a_record(fp, lock);
         close(fp);
     }
     return BOOK_DELETED;
@@ -203,11 +215,20 @@ int update_book(int id, char* new_title, char* new_author, int new_quantity_in_s
             return ERROR;
         }
 
-        lseek(fp, (book.id - 1) * sizeof(struct Book), SEEK_SET);
-        if (write(fp, &book, sizeof(struct Book)) == -1) {
+        int position = lseek(fp, (book.id - 1) * sizeof(struct Book), SEEK_SET);
+
+        if (position == -1) {
             close(fp);
             return ERROR;
         }
+        struct flock lock = lock_a_record(fp, position, sizeof(struct Book));
+        if (write(fp, &book, sizeof(struct Book)) == -1) {
+            unlock_a_record(fp, lock);
+            close(fp);
+            return ERROR;
+        }
+
+        unlock_a_record(fp, lock);
         close(fp);
     }
 

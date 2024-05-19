@@ -1,5 +1,6 @@
 #include "../include/authentication.h"
 #include "../include/macros.h"
+#include "../include/utils.h"
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
@@ -117,9 +118,13 @@ int create_user(char* username, char* password) {
 
     auth.key = position / sizeof(struct Authentication) + 1;
 
+    struct flock lock = lock_file(fd);
     if (write(fd, &auth, sizeof(struct Authentication)) == -1) {
+        unlock_file(fd,lock);
         return ERROR;
     }
+
+    unlock_file(fd,lock);
     close(fd);
 
     return USER_CREATED;
@@ -181,9 +186,13 @@ int modify_user(char* username, char* password, char* new_password) {
 
     strcpy(auth.password, new_password);
 
+    struct flock lock = lock_a_record(fd,position,sizeof(struct Authentication));
     if (write(fd, &auth, sizeof(struct Authentication)) == -1) {
+        unlock_a_record(fd,lock);
         return ERROR;
     }
+
+    unlock_a_record(fd,lock);
     close(fd);
     return USER_MODIFIED;
 }
