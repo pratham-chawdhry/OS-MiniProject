@@ -59,6 +59,7 @@ int search_book(struct Book* book, int comparison_id) {
                     strcpy(book->title, comparison_book.title);
                     strcpy(book->author, comparison_book.author);
                     book->quantity_in_stock = comparison_book.quantity_in_stock;
+                    book->deleted = comparison_book.deleted;
                     close(fp);
                     return BOOK_EXISTS;
                 }

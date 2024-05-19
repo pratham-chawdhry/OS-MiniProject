@@ -62,6 +62,11 @@ void user_menu(int new_sock_fd, char* username, char* password) {
                 break;
             }
             case 3:{
+                int book_id;
+                read(new_sock_fd, &book_id, sizeof(book_id));
+
+                int book_status = return_book(book_id, username, password);
+                write(new_sock_fd, &book_status, sizeof(book_status));
                 break;
             }
             default:

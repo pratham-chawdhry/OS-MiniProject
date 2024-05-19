@@ -86,6 +86,29 @@ void user_menu(int sock_fd){
                 }
             } break;
             case 3:{
+                int id;
+                printf("Enter Book ID: ");
+                scanf("%d", &id);
+                write(sock_fd, &id, sizeof(id));
+
+                int book_status;
+                read(sock_fd, &book_status, sizeof(book_status));
+
+                if (book_status == BOOK_DOES_NOT_EXIST) {
+                    printf("\nBook does not exist...\n");
+                }
+                else if (book_status == USER_DOES_NOT_EXIST) {
+                    printf("\nUser does not exist...\n");
+                }
+                else if (book_status == BOOK_ISNT_BORROWED) {
+                    printf("\nBook is not borrowed...\n");
+                }
+                else if (book_status == ERROR) {
+                    printf("\nError while checking book...\n");
+                }
+                else if (book_status == BOOK_RETURNED) {
+                    printf("\nBook returned successfully...\n");
+                }
             } break;
         }
     }
