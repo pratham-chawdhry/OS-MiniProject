@@ -51,7 +51,29 @@ void user_menu(int sock_fd){
         switch (option) {
             case 1:{
                 int num_of_books;
-                read(sock_fd, &length_of_prompt, sizeof(length_of_prompt));
+                read(sock_fd, &num_of_books, sizeof(num_of_books));
+
+                printf("\nThere are %d books issued to you. List of books:\n", num_of_books);
+
+                for (int i = 0; i < num_of_books; i++) {
+                    int id;
+                    char* title;
+                    char* author;
+
+                    read(sock_fd, &id, sizeof(id));
+                    write(sock_fd, buffer, sizeof(buffer));
+
+                    title = (char*)malloc(100 * sizeof(char));
+                    read(sock_fd, title, 100);
+                    write(sock_fd, buffer, sizeof(buffer));
+
+                    author = (char*)malloc(100 * sizeof(char));
+                    read(sock_fd, author, 100);
+                    write(sock_fd, buffer, sizeof(buffer));
+
+                    printf("\nID: %d\nTitle: %s\nAuthor: %s\n", id, title, author);
+
+                }
             } break;
             case 2:{
                 int id;

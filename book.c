@@ -220,8 +220,6 @@ int get_user_books(int arr[], struct Book **books, int num_of_books) {
         return ERROR;
     }
 
-    printf("Your books: \n");
-    printf("Number of books: %d\n", num_of_books);
     for (int i = 0; i < num_of_books; i++) {
         struct Book book;
         book.id = arr[i];
@@ -249,11 +247,6 @@ int get_user_books(int arr[], struct Book **books, int num_of_books) {
         if (books[i] == NULL) {
             return ERROR;
         }
-
-        printf("Book ID: %d\n", books[i]->id);
-        printf("Title: %s\n", books[i]->title);
-        printf("Author: %s\n", books[i]->author);
-        printf("\n");
     }
 
     close(fp);

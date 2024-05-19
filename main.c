@@ -60,6 +60,20 @@ void user_menu(int new_sock_fd, char* username, char* password) {
                 struct Book** books = (struct Book**)malloc(num_of_books * sizeof(struct Book*));
                 int book_status = get_user_books(arr, books, num_of_books);
 
+                for (int i = 0; i < num_of_books; i++){
+                    int id = books[i]->id;
+                    char* title = books[i]->title;
+                    char* author = books[i]->author;
+                    
+                    write(new_sock_fd, &id, sizeof(id));
+                    read(new_sock_fd, buffer, sizeof(buffer));
+
+                    write(new_sock_fd, title, strlen(title) + 1);
+                    read(new_sock_fd, buffer, sizeof(buffer));
+
+                    write(new_sock_fd, author, strlen(author) + 1);
+                    read(new_sock_fd, buffer, sizeof(buffer));
+                }
                 // for (int i = 0; i < num_of_books; i++){
                 //     int id = books[i]->id;
                 //     char* title = books[i]->title;
