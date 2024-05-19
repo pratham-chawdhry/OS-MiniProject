@@ -188,6 +188,14 @@ int get_num_of_user_books(char *username, char *password, int arr[], int *num_of
 
     for (int i = 0; i < BORROWING_LIMITS; i++) {
         if (auth.borrow_items[i] != 0) {
+            struct Book book;
+            book.id = auth.borrow_items[i];
+
+            if (search_book(&book, 2) != BOOK_EXISTS) {
+                auth.borrow_items[i] = 0;
+                continue;
+            }
+
             arr[*num_of_books] = auth.borrow_items[i];
             *num_of_books = *num_of_books + 1;
         }
