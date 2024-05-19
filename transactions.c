@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include "transactions.h"
 #include <unistd.h>
-#include <sys/types.h>
+#include <sys/types.h>    
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -50,8 +50,6 @@ int issue_book(int book_id, char* username, char* password) {
         if (auth.borrow_items[i] == book_id) {
             return BOOK_ALREADY_ISSUED;
         }
-
-        printf("%d\n", auth.borrow_items[i]);
     }
 
     if (empty_index == -1) {
@@ -130,7 +128,7 @@ int return_book(int book_id, char* username, char* password) {
             return BOOK_ISNT_BORROWED;
         }
     }
-    
+
     auth.borrow_items[i] = 0;
 
     if (search_book(&book, 2) == BOOK_DOES_NOT_EXIST) { //Check if book exists
@@ -176,4 +174,27 @@ int return_book(int book_id, char* username, char* password) {
     }
     close(fp);
     return BOOK_RETURNED;
+}
+
+int get_num_of_user_books(char *username, char *password, int arr[], int *num_of_books) {
+    struct Authentication auth;
+    auth.key = -1;
+    strcpy(auth.username, username);
+    strcpy(auth.password, password);
+    for (int i = 0; i < 20; i++) auth.borrow_items[i] = 0;
+    auth.is_deleted = 0;
+
+    if (search_user(&auth, 3) == USER_DOES_NOT_EXIST) {
+        return USER_DOES_NOT_EXIST;
+    }
+
+    for (int i = 0; i < BORROWING_LIMITS; i++) {
+        if (auth.borrow_items[i] != 0) {
+            arr[*num_of_books] = auth.borrow_items[i];
+            *num_of_books = *num_of_books + 1;
+        }
+    }
+
+    printf("Number of books borrowed: %d\n", *num_of_books);
+    return ERROR;
 }

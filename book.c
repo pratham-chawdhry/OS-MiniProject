@@ -213,3 +213,49 @@ int update_book(int id, char* new_title, char* new_author, int new_quantity_in_s
 
     return BOOK_MODIFIED;
 }
+
+int get_user_books(int arr[], struct Book **books, int num_of_books) {
+    int fp = open("books.dat", O_RDONLY | O_CREAT, 0666);
+    if (fp == -1) {
+        return ERROR;
+    }
+
+    printf("Your books: \n");
+    printf("Number of books: %d\n", num_of_books);
+    for (int i = 0; i < num_of_books; i++) {
+        struct Book book;
+        book.id = arr[i];
+
+        lseek(fp, (book.id - 1) * sizeof(struct Book), SEEK_SET);
+        read(fp, &book, sizeof(struct Book));
+
+        if (book.deleted == 0) {
+            books[i] = (struct Book*)malloc(sizeof(struct Book));
+            if (books[i] == NULL) {
+                close(fp);
+                return ERROR; 
+            }
+            books[i]->id = book.id;
+            strcpy(books[i]->title, book.title);
+            strcpy(books[i]->author, book.author);
+            books[i]->quantity_in_stock = book.quantity_in_stock;
+        }
+        else{
+            continue;
+        }
+    }
+
+    for (int i = 0; i < num_of_books; i++) {
+        if (books[i] == NULL) {
+            return ERROR;
+        }
+
+        printf("Book ID: %d\n", books[i]->id);
+        printf("Title: %s\n", books[i]->title);
+        printf("Author: %s\n", books[i]->author);
+        printf("\n");
+    }
+
+    close(fp);
+    return BOOK_SUCCESS;
+}

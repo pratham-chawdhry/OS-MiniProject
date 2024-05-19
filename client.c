@@ -50,7 +50,8 @@ void user_menu(int sock_fd){
 
         switch (option) {
             case 1:{
-
+                int num_of_books;
+                read(sock_fd, &length_of_prompt, sizeof(length_of_prompt));
             } break;
             case 2:{
                 int id;
@@ -182,36 +183,6 @@ void admin_menu(int sock_fd){
                 }
             }
                 break;
-            // case 2:{
-            //     char username[100];
-            //     char password[100];
-
-            //     char buffer[100];
-
-            //     printf("\nEnter username: ");
-            //     scanf("%s", username);
-
-            //     printf("Enter password: ");
-            //     scanf("%s", password);
-
-            //     write(sock_fd, username, strlen(username) + 1);
-            //     read(sock_fd, buffer, sizeof(buffer));
-            //     write(sock_fd, password, strlen(password) + 1);
-
-            //     int user_status;
-            //     read(sock_fd, &user_status, sizeof(user_status));
-
-            //     if (user_status == USER_DELETED) {
-            //         printf("\nUser deleted successfully...\n");
-            //     }
-            //     else if (user_status == USER_DOES_NOT_EXIST) {
-            //         printf("\nUser does not exist, so cannot be deleted...\n");
-            //     }
-            //     else if (user_status == ERROR) {
-            //         printf("\nError while deleting user...\n");
-            //     }
-            // }
-            //     break;
             case 2:{
                 char username[100];
                 char password[100];
@@ -433,8 +404,6 @@ void admin_menu(int sock_fd){
                 }
             }
                 break;
-            // case 8:{}
-            //     break;
             case 7:{}
                 break;
         }

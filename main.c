@@ -51,6 +51,33 @@ void user_menu(int new_sock_fd, char* username, char* password) {
 
         switch (user_choice) {
             case 1:{
+                int arr[BORROWING_LIMITS];
+                int num_of_books = 0;
+
+                int book_num = get_num_of_user_books(username, password, arr, &num_of_books);
+                write(new_sock_fd, &num_of_books, sizeof(num_of_books));
+
+                struct Book** books = (struct Book**)malloc(num_of_books * sizeof(struct Book*));
+                int book_status = get_user_books(arr, books, num_of_books);
+
+                // for (int i = 0; i < num_of_books; i++){
+                //     int id = books[i]->id;
+                //     char* title = books[i]->title;
+                //     char* author = books[i]->author;
+                //     int quantity = books[i]->quantity_in_stock;
+
+                //     write(new_sock_fd, &id, sizeof(id));
+                //     read(new_sock_fd, buffer, sizeof(buffer));
+
+                //     write(new_sock_fd, title, strlen(title) + 1);
+                //     read(new_sock_fd, buffer, sizeof(buffer));
+
+                //     write(new_sock_fd, author, strlen(author) + 1);
+                //     read(new_sock_fd, buffer, sizeof(buffer));
+
+                //     write(new_sock_fd, &quantity, sizeof(quantity));
+                //     read(new_sock_fd, buffer, sizeof(buffer));
+                // }
                 break;
             }
             case 2:{
@@ -111,19 +138,6 @@ void admin_menu(int new_sock_fd) {
                 write(new_sock_fd, &user_status, sizeof(user_status));
             }
                 break;
-            // case 2:{
-            //     char username[100];
-            //     char password[100];
-            //     char buffer[] = "Ready for input\n";
-
-            //     read(new_sock_fd, username, 100);
-            //     write(new_sock_fd, buffer, sizeof(buffer));
-            //     read(new_sock_fd, password, 100);
-
-            //     int user_status = delete_user(username, password);
-            //     write(new_sock_fd, &user_status, sizeof(user_status));
-            // }
-            //     break;
             case 2:{
                 char username[100];
                 char password[100];
