@@ -6,7 +6,7 @@
 extern pthread_mutex_t mutex_users;
 extern pthread_cond_t mutex_books;
 
-#define PORT 6607
+#define PORT 6609
 
 #define INET_ADDR "127.0.0.1"
 #define BACKLOG 10

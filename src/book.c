@@ -59,7 +59,6 @@ int search_book(struct Book* book, int comparison_id) {
             if (comparison_id == 1) {
                 if (strcmp(book->title, comparison_book.title) == 0 && strcmp(book->author, comparison_book.author) == 0) {
                     book->id = comparison_book.id;
-                    book->quantity_in_stock = comparison_book.quantity_in_stock;
 
                     unlock_file(fp, lock);
                     close(fp);
