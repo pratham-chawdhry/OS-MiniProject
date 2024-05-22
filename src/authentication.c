@@ -19,20 +19,31 @@ bool authenticate_user(struct Authentication* auth) {
     }
 
     struct Authentication comparison;
+
+    struct flock lock = lock_a_read_file(fd);
+
     while (read(fd, &comparison, sizeof(struct Authentication)) > 0) {
         if (strcmp(auth->username, comparison.username) == 0) {
             if (strcmp(auth->password, comparison.password) != 0) {
                 printf("Wrong password. Please try again\n");
                 auth->key = 0;
+                unlock_file(fd,lock);
                 return false;
             }
             else{
                 comparison.key = auth->key;
             }
+
+            auth->key = comparison.key;
+            auth->is_deleted = comparison.is_deleted;
+
+            unlock_file(fd, lock);
             close(fd);
             return true;
         }
     }
+
+    unlock_file(fd, lock);
     close(fd);
     return false;
 }
@@ -63,10 +74,17 @@ int search_user(struct Authentication* auth, int id) {
     }
 
     struct Authentication comparison;
+
+    struct flock lock = lock_a_read_file(fd);
+
     while (read(fd, &comparison, sizeof(struct Authentication)) > 0) {
         if (comparison.is_deleted == 1) continue; //ignore deleted users
         if (id == 1){ //we need to check if a user exists, so username is important
             if (strcmp(auth->username, comparison.username) == 0) {
+                auth->key = comparison.key;
+                auth->is_deleted = comparison.is_deleted;
+
+                unlock_file(fd, lock);
                 close(fd);
                 return USER_EXISTS;
             }
@@ -75,6 +93,8 @@ int search_user(struct Authentication* auth, int id) {
             if (strcmp(auth->username, comparison.username) == 0 && strcmp(auth->password, comparison.password) == 0) {
                 auth->key = comparison.key;
                 auth->is_deleted = 1;
+
+                unlock_file(fd, lock);
                 close(fd);
                 return USER_EXISTS;
             }
@@ -83,12 +103,15 @@ int search_user(struct Authentication* auth, int id) {
             if (strcmp(auth->username, comparison.username) == 0 && strcmp(auth->password, comparison.password) == 0) {
                 auth->key = comparison.key;
                 for (int i = 0; i < 20; i++) auth->borrow_items[i] = comparison.borrow_items[i]; //copy borrow items
+
+                unlock_file(fd, lock);
                 close(fd);
                 return USER_EXISTS;
             }
         }
     }
 
+    unlock_file(fd, lock);
     close(fd);
     return USER_DOES_NOT_EXIST;
 }
@@ -111,7 +134,7 @@ int create_user(char* username, char* password) {
     }
 
     int position = lseek(fd, 0, SEEK_END);
-
+    
     if (position == -1) {
         return ERROR;
     }

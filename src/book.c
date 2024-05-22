@@ -51,11 +51,17 @@ int search_book(struct Book* book, int comparison_id) {
     }
 
     struct Book comparison_book;
+
+    struct flock lock = lock_a_read_file(fp);
+
     while (read(fp, &comparison_book, sizeof(struct Book)) > 0) {
         if (comparison_book.deleted == 0) {
             if (comparison_id == 1) {
                 if (strcmp(book->title, comparison_book.title) == 0 && strcmp(book->author, comparison_book.author) == 0) {
                     book->id = comparison_book.id;
+                    book->quantity_in_stock = comparison_book.quantity_in_stock;
+
+                    unlock_file(fp, lock);
                     close(fp);
                     return BOOK_EXISTS;
                 }
@@ -66,12 +72,16 @@ int search_book(struct Book* book, int comparison_id) {
                     strcpy(book->author, comparison_book.author);
                     book->quantity_in_stock = comparison_book.quantity_in_stock;
                     book->deleted = comparison_book.deleted;
+
+                    unlock_file(fp, lock);
                     close(fp);
                     return BOOK_EXISTS;
                 }
             }
         }
     }
+
+    unlock_file(fp, lock);
     close(fp);
     return BOOK_DOES_NOT_EXIST;
 }
@@ -109,6 +119,7 @@ int delete_book(char* title, char* author) {
     if (result == BOOK_DOES_NOT_EXIST) {
         return BOOK_DOES_NOT_EXIST;
     }
+
     else{
         int fp = open("books.dat", O_WRONLY | O_CREAT, 0666);
         if (fp == -1) {
@@ -139,13 +150,18 @@ int get_num_of_books() {
 
     lseek(fp, 0, SEEK_SET);
     num_of_unique_books = 0;
+
     struct Book book;
+
+    struct flock lock = lock_a_read_file(fp);
+
     while (read(fp, &book, sizeof(struct Book)) > 0) {
         if (book.deleted == 0) {
             num_of_unique_books++;
         }
     }
 
+    unlock_file(fp, lock);
     close(fp);
     return num_of_unique_books;
 }
@@ -160,10 +176,13 @@ int get_books(struct Book** books) {
     int count = 0;
     struct Book book;
 
+    struct flock lock = lock_a_read_file(fp);
+
     while (read(fp, &book, sizeof(struct Book)) > 0) {
         if (book.deleted == 0) {
             books[count] = (struct Book*)malloc(sizeof(struct Book));
             if (books[count] == NULL) {
+                unlock_file(fp, lock);
                 close(fp);
                 return ERROR; 
             }
@@ -175,6 +194,7 @@ int get_books(struct Book** books) {
         }
     }
 
+    unlock_file(fp, lock);
     close(fp);
     return BOOK_SUCCESS; 
 }
@@ -241,6 +261,8 @@ int get_user_books(int arr[], struct Book **books, int num_of_books) {
         return ERROR;
     }
 
+    struct flock lock = lock_a_read_file(fp);
+
     for (int i = 0; i < num_of_books; i++) {
         struct Book book;
         book.id = arr[i];
@@ -251,6 +273,7 @@ int get_user_books(int arr[], struct Book **books, int num_of_books) {
         if (book.deleted == 0) {
             books[i] = (struct Book*)malloc(sizeof(struct Book));
             if (books[i] == NULL) {
+                unlock_file(fp, lock);
                 close(fp);
                 return ERROR; 
             }
@@ -266,10 +289,13 @@ int get_user_books(int arr[], struct Book **books, int num_of_books) {
 
     for (int i = 0; i < num_of_books; i++) {
         if (books[i] == NULL) {
+            unlock_file(fp, lock);
+            close(fp);
             return ERROR;
         }
     }
 
+    unlock_file(fp, lock);
     close(fp);
     return BOOK_SUCCESS;
 }
